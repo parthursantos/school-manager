@@ -11,7 +11,6 @@ const EnrollmentSchema = new mongoose.Schema(
             type: String,
             enum: ["Ativa", "Concluida", "Cancelada"],
             default: "Ativa",
-            lowercase: true,
             trim: true
         },
         notaFinal: {

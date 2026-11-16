@@ -12,4 +12,6 @@ router.post(
 
 router.get("/", enrollmentController.getAllEnrollments)
 
+router.get("/:id", enrollmentController.getEnrollmentsById)
+
 export default router;

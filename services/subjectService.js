@@ -47,6 +47,7 @@ const createSubject = async (data) => {
 };
 
 const getAllSubjects = async () => {
+  console.log("teste")
   return Subject.find();
 };
 
