@@ -139,6 +139,34 @@ const deleteEnrollment = async (req, res, next) => {
   }
 };
 
+const getStudentHistory = async (req, res, next) => {
+  try {
+    const enrollment = await enrollmentService.getStudentHistory(
+      req.params.studentId,
+    );
+
+    res.status(200).json({
+      message: "Histórico desse estudante: ",
+      data: enrollment,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const countSubjectsByStudent = async (req, res, next) => {
+  try {
+    const enrollment = await enrollmentService.countSubjectsByStudent(req.params.subjectId)
+
+    res.status(200).json({
+      message: "Histórico desse estudante: ",
+      data: enrollment,
+    });
+  } catch (error) {
+    next(error)
+  }
+};
+
 export default {
   createEnrollment,
   getAllEnrollments,
@@ -150,4 +178,6 @@ export default {
   updadeteGrade,
   updateEnrollmentsStatus,
   deleteEnrollment,
+  getStudentHistory,
+  countSubjectsByStudent
 };

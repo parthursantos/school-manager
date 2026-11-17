@@ -23,10 +23,20 @@ router.get("/status/:status", enrollmentController.getEnrollmentByStatus);
 
 router.get("//count", enrollmentController.countEnrollments);
 
-router.patch("/:id/grade", enrollmentController.updadeteGrade)
+router.patch("/:id/grade", enrollmentController.updadeteGrade);
 
-router.patch("/:id/status", enrollmentController.updateEnrollmentsStatus)
+router.patch("/:id/status", enrollmentController.updateEnrollmentsStatus);
 
-router.delete("/:id/delete", enrollmentController.deleteEnrollment)
+router.delete("/:id/delete", enrollmentController.deleteEnrollment);
+
+router.get(
+  "/students/:studentId/history",
+  enrollmentController.getStudentHistory,
+);
+
+router.get(
+  "/subjects/:subjectId/students/count",
+  enrollmentController.countSubjectsByStudent,
+);
 
 export default router;
