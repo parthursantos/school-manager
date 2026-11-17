@@ -39,7 +39,7 @@ const TeacherSchema = new mongoose.Schema(
         },
     },
     {
-        collection: "enrollments",
+        collection: "teachers",
         timestamps: true
     }
 )
