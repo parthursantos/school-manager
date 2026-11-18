@@ -1,4 +1,4 @@
-import e from "express";
+import express from "express";
 import Enrollment from "../models/Enrollment.js";
 import Student from "../models/Student.js";
 import Subject from "../models/Subject.js";
