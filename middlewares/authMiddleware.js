@@ -1,5 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import { use } from "react";
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -32,7 +33,15 @@ const authMiddleware = async (req, res, next) => {
     if (!user.ativo) {
       return res.status(403).json({ error: "Usuário inativo" });
     }
+
+    req.user = user;
+
+    next();
   } catch (error) {
-    next(error);
+    return res.status(403).json({ error: "Toke invalido ou mal formatado" });
   }
 };
+
+export default {
+  authMiddleware,
+}
