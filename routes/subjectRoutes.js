@@ -1,24 +1,59 @@
-import express from "express"
-import subjectController from "../controllers/subjectController.js"
+import express from "express";
 
-const router = express.Router()
+import authMiddleware from "../middlewares/authMiddleware.js";
 
-router.post("/", subjectController.createSubject)
+import adminMiddleware from "../middlewares/adminMiddleware.js";
 
-router.get("/", subjectController.getAllSubjects)
+import subjectController from "../controllers/subjectController.js";
 
-router.get("/:id/d", subjectController.getSubjectById)
+const router = express.Router();
 
-router.get("/teacher/:teacherId", subjectController.getTeacherSubjects)
+router.post(
+  "/",
+  authMiddleware,
+  adminMiddleware,
+  subjectController.createSubject,
+);
 
-router.get("/active/c", subjectController.getActivesSubjects)
+router.get("/", authMiddleware, subjectController.getAllSubjects);
 
-router.get("/:hours/s", subjectController.getHours)
+router.get("/:id/d", authMiddleware, subjectController.getSubjectById);
 
-router.put("/:id/subjects", subjectController.updateSubjects)
+router.get(
+  "/teacher/:teacherId",
+  authMiddleware,
+  adminMiddleware,
+  subjectController.getTeacherSubjects,
+);
 
-router.patch("/:id/status", subjectController.updateSubjectsStatus)
+router.get(
+  "/active/c",
+  authMiddleware,
+  adminMiddleware,
+  subjectController.getActivesSubjects,
+);
 
-router.delete("/:id/delete", subjectController.deleteSubjects)
+router.get(
+  "/:hours/s",
+  authMiddleware,
+  adminMiddleware,
+  subjectController.getHours,
+);
+
+router.put("/:id/subjects", authMiddleware, subjectController.updateSubjects);
+
+router.patch(
+  "/:id/status",
+  authMiddleware,
+  adminMiddleware,
+  subjectController.updateSubjectsStatus,
+);
+
+router.delete(
+  "/:id/delete",
+  authMiddleware,
+  adminMiddleware,
+  subjectController.deleteSubjects,
+);
 
 export default router;

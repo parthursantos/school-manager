@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
-import { use } from "react";
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -10,13 +9,13 @@ const authMiddleware = async (req, res, next) => {
       return res.status(401).json({ error: "Token não enviado" });
     }
 
-    const parts = authorization.split("");
+    const parts = authorization.split(" ");
 
     if (parts.length !== 2) {
       return res.status(401).json({ error: "Token mal formatado" });
     }
 
-    const { scheme, token } = parts;
+    const [scheme, token] = parts;
 
     if (scheme !== "Bearer") {
       return res.status(401).json({ error: "Formato do token invalido" });
@@ -38,10 +37,8 @@ const authMiddleware = async (req, res, next) => {
 
     next();
   } catch (error) {
-    return res.status(403).json({ error: "Toke invalido ou mal formatado" });
+    return res.status(403).json({ error: "Token invalido ou mal formatado" });
   }
 };
 
-export default {
-  authMiddleware,
-}
+export default authMiddleware

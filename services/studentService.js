@@ -1,48 +1,60 @@
 import Student from "../models/Student.js";
 
 const createStudent = async (data) => {
-  const { nome, email, idade, matricula } = data;
+  const { nome, email, userId, password, idade, matricula } = data;
 
-  if (!nome || !email || !idade || !matricula) {
+  if (!nome || !email || !idade || !matricula || !password) {
     const error = new Error("All fields are required");
     error.statuscode = 400;
     throw error;
   }
 
-  const studentExists = await Student.findOne({ matricula });
-
-  if (studentExists) {
-    const error = new Error("This registration number is already registered.");
-    error.statusCode = 400;
-    throw error;
-  }
-
-  const student = await Student.create({
-    nome,
-    email,
-    idade,
-    matricula,
-  });
-
-  return {
-    _id: student._id,
-    nome: student.nome,
-    email: student.email,
-    idade: student.idade,
-    matricula: student.matricula,
-    createdAt: student.createdAt,
-    updatedAt: student.updatedAt,
-  };
-
-  return student;
+  const userExists = await User.findOne({ email });
+  
+    if (userExists) {
+      const error = new Error("O email ja foi utilizado");
+      error.statusCode = 400;
+      throw error;
+    }
+  
+    const hashPassword = await bcrypt.hash(password, 10);
+  
+    const user = await User.create({
+      nome,
+      email,
+      userId,
+      password: hashPassword,
+      role: "student",
+      ativo: "true",
+    });
+  
+    try {
+      const student = await Student.create({
+        userId: user._id,
+        idade,
+        matricula,
+        ativo: true,
+      });
+  
+      return Student.findById(student._id)
+  
+      .populate("userId","nome email role")
+  
+    } catch (error) {
+      await User.findByIdAndDelete(user._id)
+      throw error
+    }
+  
 };
 
 const getAllStudents = async () => {
-  return Student.find();
+  return Student.find()
+  .populate("userId")
 };
 
 const getStudentsById = async (id) => {
-  const student = await Student.findById(id);
+  const student = await Student.findById(id)
+  .populate("userId","nome email")
 
   if (!student) {
     const error = new Error("Student not finded, Try again with another id");
@@ -56,7 +68,9 @@ const getStudentsById = async (id) => {
 const getStudentsActive = async () => {
   const student = await Student.find({
     ativo: true,
-  });
+  })
+  .populate("userId","nome email")
+
   if (!student) {
     const error = new Error(
       "No active students found, please try again later.",
@@ -69,7 +83,8 @@ const getStudentsActive = async () => {
 };
 
 const getStudentByName = async (nome) => {
-  const student = await Student.find({ nome });
+  const student = await Student.find({ nome })
+  .populate("userId","nome email")
 
   if (!student) {
     const error = new Error("Students with this name dont finded");

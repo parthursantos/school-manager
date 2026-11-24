@@ -1,25 +1,64 @@
+import express from "express";
 
-import express from "express"
-import studentController from "../controllers/studentController.js"
+import authMiddleware from "../middlewares/authMiddleware.js";
 
-const router = express.Router()
+import adminMiddleware from "../middlewares/adminMiddleware.js";
 
-router.post("/", studentController.createStudent)
+import studentController from "../controllers/studentController.js";
 
-router.get("/", studentController.getAllStudents)
+const router = express.Router();
 
-router.get("/:id", studentController.getStudentsById)
+router.post(
+  "/",
+  authMiddleware,
+  adminMiddleware,
+  studentController.createStudent,
+);
 
-router.get("/active/students", studentController.getStudentsActive)
+router.get(
+  "/",
+  authMiddleware,
+  adminMiddleware,
+  studentController.getAllStudents,
+);
 
-router.get("/:name/students", studentController.getStudentByName)
+router.get("/:id", authMiddleware, studentController.getStudentsById);
 
-router.get("/count/students/count", studentController.countStudent)
+router.get(
+  "/active/students",
+  authMiddleware,
+  adminMiddleware,
+  studentController.getStudentsActive,
+);
 
-router.put("/:id", studentController.updateStudent)
+router.get(
+  "/:name/students",
+  authMiddleware,
+  adminMiddleware,
+  studentController.getStudentByName,
+);
 
-router.patch("/:id/status", studentController.updateStatus)
+router.get(
+  "/count/students/count",
+  authMiddleware,
+  adminMiddleware,
+  studentController.countStudent,
+);
 
-router.delete("/:id", studentController.deleteStudent)
+router.put("/:id", authMiddleware, studentController.updateStudent);
+
+router.patch(
+  "/:id/status",
+  authMiddleware,
+  adminMiddleware,
+  studentController.updateStatus,
+);
+
+router.delete(
+  "/:id",
+  authMiddleware,
+  adminMiddleware,
+  studentController.deleteStudent,
+);
 
 export default router;

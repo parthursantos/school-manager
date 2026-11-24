@@ -1,50 +1,61 @@
 import Teacher from "../models/Teacher.js";
+import User from "../models/User.js";
+import userService from "./userService.js";
 
 const createTeacher = async (data) => {
-  const { nome, email, idade, especialidade, telefone } = data;
+  const { nome, email, password, idade, especialidade, telefone } = data;
 
-  if (!nome || !email || !idade || !especialidade || !telefone) {
+  if (!nome || !email || !idade || !especialidade || !telefone || !password) {
     const error = new Error("All fields are required");
     error.statuscode = 400;
     throw error;
   }
 
-  const teacherExists = await Teacher.findOne({ telefone });
+  const userExists = await User.findOne({ email });
 
-  if (teacherExists) {
-    const error = new Error("This phone number is already in use.");
+  if (userExists) {
+    const error = new Error("O email ja foi utilizado");
     error.statusCode = 400;
     throw error;
   }
 
-  const teacher = await Teacher.create({
+  const hashPassword = await bcrypt.hash(password, 10);
+
+  const user = await User.create({
     nome,
     email,
-    idade,
-    especialidade,
+    password: hashPassword,
     telefone,
+    role: "teacher",
+    ativo: "true",
   });
 
-  return {
-    _id: teacher._id,
-    nome: teacher.nome,
-    email: teacher.email,
-    idade: teacher.idade,
-    especialidade: teacher.especialidade,
-    telefone: teacher.telefone,
-    createdAt: teacher.createdAt,
-    updatedAt: teacher.updatedAt,
-  };
+  try {
+    const teacher = await Teacher.create({
+      userId: user._id,
+      idade,
+      especialidade,
+      ativo: true,
+    });
 
-  return teacher;
+    return Teacher.findById(teacher._id)
+
+    .populate("userId","nome email telefone role")
+
+  } catch (error) {
+    await User.findByIdAndDelete(user._id)
+    throw error
+  }
 };
 
 const getAllTeachers = async () => {
-  return Teacher.find();
+  return Teacher.find()
+  .populate("userId")
 };
 
 const getTeacherById = async (id) => {
-  const teacher = await Teacher.findById(id);
+  const teacher = await Teacher.findById(id)
+  .populate("userId", "nome email")
 
   if (!teacher) {
     const error = new Error("teacher not finded, Try again with another id");
@@ -56,7 +67,8 @@ const getTeacherById = async (id) => {
 };
 
 const getTeacherActive = async () => {
-  const teacher = await Teacher.find({ ativo: true });
+  const teacher = await Teacher.find({ ativo: true })
+    .populate("userId", "nome email")
 
   if (!teacher) {
     const error = new Error("teacher actives not finded, try again later");
@@ -68,7 +80,8 @@ const getTeacherActive = async () => {
 };
 
 const getTeacherBySpecialty = async (especialidade) => {
-  const teacher = await Teacher.find({ especialidade });
+  const teacher = await Teacher.find({ especialidade })
+  .populate("userId", "nome email")
 
   if (!teacher) {
     const error = new Error("teacher not finded, try again later");
@@ -111,7 +124,7 @@ const updateTeacherStatus = async (id, data) => {
     throw error;
   }
   return teacher;
-}
+};
 
 const deleteTeacher = async (id, data) => {
   const { nome, email, idade, especialidade, telefone } = data;
@@ -126,7 +139,7 @@ const deleteTeacher = async (id, data) => {
     throw error;
   }
   return teacher;
-}
+};
 
 export default {
   createTeacher,
@@ -137,5 +150,5 @@ export default {
   countTeachers,
   updateTeacher,
   updateTeacherStatus,
-  deleteTeacher
+  deleteTeacher,
 };
